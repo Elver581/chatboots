@@ -1,0 +1,166 @@
+const { createBot, createProvider, createFlow, addKeyword, EVENTS } = require('@bot-whatsapp/bot');
+const QRPortalWeb = require('@bot-whatsapp/portal');
+const BaileysProvider = require('@bot-whatsapp/provider/baileys');
+const MockAdapter = require('@bot-whatsapp/database/mock');
+
+// Ruta del catálogo en tu proyecto
+const catalogoURL = 'https://setasplast.com.co/assets/SetasPlastBrochureEmpresarial-eawpt2g4.pdf'; 
+
+// Duración del timeout en milisegundos (10 minutos)
+const timeoutDuration = 10 * 60 * 1000;
+
+// Funciones para cada flujo
+const flowAtencionCliente = addKeyword(EVENTS.ACTION)
+    .addAnswer("Hola, sigue el enlace haciendo clic en el siguiente botón:")
+    .addAnswer("[📲 Atención al Cliente](https://api.whatsapp.com/send?phone=573105083525&text=Hola)")
+    .addAnswer("Gracias por comunicarte con nosotros. ¿Puedo ayudarte con algo más?", null, async (ctx, { gotoFlow }) => {
+        return gotoFlow(menuFlow); // Mostrar el menú automáticamente
+    });
+
+const flowAreaComercial = addKeyword(EVENTS.ACTION)
+    .addAnswer("Área Comercial, sigue el enlace haciendo clic en el siguiente botón:")
+    .addAnswer("[💼 Área Comercial](https://api.whatsapp.com/send?phone=573145719136&text=Hola)")
+    .addAnswer("Gracias por comunicarte con el área comercial. ¿Puedo ayudarte con algo más?", null, async (ctx, { gotoFlow }) => {
+        return gotoFlow(menuFlow); // Mostrar el menú automáticamente
+    });
+
+const flowContabilidad = addKeyword(EVENTS.ACTION)
+    .addAnswer("Área de Contabilidad, sigue el enlace haciendo clic en el siguiente botón:")
+    .addAnswer("[📊 Contabilidad](https://api.whatsapp.com/send?phone=573147302425&text=Hola)")
+    .addAnswer("Gracias por comunicarte con el área de contabilidad. ¿Puedo ayudarte con algo más?", null, async (ctx, { gotoFlow }) => {
+        return gotoFlow(menuFlow); // Mostrar el menú automáticamente
+    });
+
+const FlowAdministrativa = addKeyword(EVENTS.ACTION)
+    .addAnswer("Área Administrativa, sigue el enlace haciendo clic en el siguiente botón:")
+    .addAnswer("[📊 Admistrativa/Tesoreria](https://api.whatsapp.com/send?phone=573134924743&text=Hola)")
+    .addAnswer("Gracias por comunicarte con el área Administrativa. ¿Puedo ayudarte con algo más?", null, async (ctx, { gotoFlow }) => {
+        return gotoFlow(menuFlow); // Mostrar el menú automáticamente
+    });
+
+const FlowGestionAmbiental = addKeyword(EVENTS.ACTION)
+    .addAnswer("Gestión Ambiental, accede haciendo clic en el botón:")
+    .addAnswer("[🌍 Gestión Ambiental](https://api.whatsapp.com/send?phone=573143630641&text=Hola)")
+    .addAnswer("Gracias por comunicarte con el área de gestion ambiental. ¿Puedo ayudarte con algo más?", null, async (ctx, { gotoFlow }) => {
+        return gotoFlow(menuFlow); // Mostrar el menú automáticamente
+    });
+
+// Flujo del catálogo (actualizado para enviar el PDF)
+const flowCatalogo = addKeyword(["catálogo", "catalogo"]) 
+    .addAnswer("Aquí puedes ver nuestro catálogo:")
+    .addAnswer([
+        {
+            media: catalogoURL 
+        }
+    ]) 
+    .addAnswer("Gracias por revisar nuestro catálogo. ¿Puedo ayudarte con algo más?", null, async (ctx, { gotoFlow }) => {
+        return gotoFlow(menuFlow); // Mostrar el menú automáticamente
+    });
+
+const flowPqr = addKeyword(EVENTS.ACTION)
+    .addAnswer("Para consultas, puedes enviarnos un correo haciendo clic en el botón:")
+    .addAnswer("[✉️ Enviar Correo](mailto:elveral100@gmail.com?subject=Consulta&body=Hola,%20tengo%20una%20pregunta.)")
+    .addAnswer("Gracias por comunicarte con PQR. ¿Puedo ayudarte con algo más?", null, async (ctx, { gotoFlow }) => {
+        return gotoFlow(menuFlow); // Mostrar el menú automáticamente
+    });
+
+// Flujo principal de bienvenida
+const flowPrincipal = addKeyword([
+    "hola",  
+    "buenos dias", 
+    "buenas tardes", 
+    "buenas noches", 
+    "HOLA",  
+    "BUENOS DIAS", 
+    "BUENAS TARDES", 
+    "BUENAS NOCHES"
+])
+.addAnswer('👋 ¡Hola! Bienvenido a nuestro Chatbot  soy Gaia🤖 tu asesora vitual' ,{
+    media:"https://66df26a3417a4a3cbd85c535--iridescent-clafoutis-f96418.netlify.app/assets/guia-r6eU_DZf.webp"
+})
+
+.addAnswer(
+    [
+        'Somos [ SETASPLAST SAS BIC], especializados en la comercialización de productos plásticos biodegradables y 100% reciclables 🌱🌍✨.',
+        '',
+        'A continuación te mostramos nuestras opciones principales:'
+    ], 
+    null,
+    async (ctx, { gotoFlow }) => {
+        return gotoFlow(menuFlow); // Mostrar el menú directamente
+    }
+);
+
+// Flujo para manejar las opciones del menú (con cierre de conversación por inactividad)
+const menuFlow = addKeyword(["menu", "Menu", "1", "2", "3", "4", "5", "0"]).addAnswer(
+    [
+        '🌐 Canales de Comunicación',
+        '',
+        'Te comparto nuestros canales de comunicación para brindarte una mejor atención:',
+        '',
+        'Selecciona una Opción:',
+        '',
+        '1️⃣ Área Comercial',
+        '2️⃣ Contabilidad',
+        '3️⃣ Área Administrativa',
+        '4️⃣ Gestión Ambiental',
+        '5️⃣ Atención al Cliente',
+        '6️⃣ PQR',
+        '7️⃣ Catálogo',
+        '',
+        '✏️ Escribe el número correspondiente para continuar.'
+    ],
+    { capture: true },
+    async (ctx, { gotoFlow, fallBack, flowDynamic }) => {
+        const opcionesValidas = ["1", "2", "3", "4", "5", "6", "7"];
+
+        // Iniciar el temporizador cuando se muestra el menú
+        let timeoutId = setTimeout(async () => {
+            await flowDynamic('😅 Ups!!! veo que te ocupaste, por falta de contacto cerraré la 💬 conversación pero, podrás retomar cuando lo desees escribiendo la palabra 👉 asesor');
+        }, timeoutDuration);
+
+        if (!opcionesValidas.includes(ctx.body)) {
+            // Limpiar el temporizador si la respuesta no es válida
+            clearTimeout(timeoutId);
+            return fallBack("❌ Respuesta no válida, por favor selecciona una opción válida.");
+        }
+
+        // Limpiar el temporizador si se selecciona una opción válida
+        clearTimeout(timeoutId);
+
+        switch (ctx.body) {
+            case "1":
+                return gotoFlow(flowAreaComercial);
+            case "2":
+                return gotoFlow(flowContabilidad);
+            case "3":
+                return gotoFlow(FlowAdministrativa);
+            case "4":
+                return gotoFlow(FlowGestionAmbiental);
+            case "5":
+                return gotoFlow(flowAtencionCliente);
+            case "6":
+                return gotoFlow(flowPqr);
+            case "7":
+                return gotoFlow(flowCatalogo); 
+        }
+    }
+);
+
+const main = async () => {
+    const adapterDB = new MockAdapter();
+    const adapterFlow = createFlow([menuFlow, flowAtencionCliente, 
+        flowAreaComercial, flowContabilidad, flowCatalogo, flowPqr, flowPrincipal, FlowAdministrativa, FlowGestionAmbiental
+    ]);
+    const adapterProvider = createProvider(BaileysProvider);
+
+    createBot({
+        flow: adapterFlow,
+        provider: adapterProvider,
+        database: adapterDB,
+    });
+
+    QRPortalWeb();
+};
+
+main();

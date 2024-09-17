@@ -1,0 +1,74 @@
+[handleMsg]:  {
+  key: {
+    remoteJid: '573026676033@s.whatsapp.net',
+    fromMe: false,
+    id: '7ED69A14F02BDA542CB64CC0B0C24FCA',
+    participant: undefined
+  },
+  messageTimestamp: 1726596584,
+  pushName: 'Elver Tique',
+  broadcast: false,
+  message: Message {
+    conversation: '9',
+    messageContextInfo: MessageContextInfo {
+      deviceListMetadata: [DeviceListMetadata],
+      deviceListMetadataVersion: 2,
+      messageSecret: [Uint8Array]
+    }
+  },
+  body: '9',
+  from: '573026676033'
+}
+[QUEUE_SE_ENVIO]:  {
+  ref: 'ans_a53572e3-b83c-4ffd-a46a-a6f3cff60574',
+  keyword: 'key_12c5b0cc-a700-4ef3-b4c1-b21bf0a3bf71',
+  answer: '🌐 *Canales de Comunicación*\n' +
+    '\n' +
+    'Te comparto nuestros canales de comunicación para brindarte una mejor atención:\n' +
+    '\n' +
+    'Selecciona una *Opción*:\n' +
+    '\n' +
+    '1️⃣ *Área Comercial*\n' +
+    '2️⃣ *Contabilidad*\n' +
+    '3️⃣ *Área Administrativa*\n' +
+    '4️⃣ *Gestión Ambiental*\n' +
+    '5️⃣ *Atención al Cliente*\n' +
+    '6️⃣ *PQR*\n' +
+    '7️⃣ *Catálogo*\n' +
+    '\n' +
+    '✏️ Escribe el número correspondiente para continuar.',
+  options: {
+    media: null,
+    buttons: [],
+    capture: true,
+    child: null,
+    delay: 0,
+    idle: null,
+    ref: null,
+    nested: [],
+    keyword: {},
+    callback: true
+  },
+  refSerialize: 'cb1e32b9cd073cd9f8f73e397973ca69'
+}
+[handleMsg]:  {
+  key: {
+    remoteJid: '573026676033@s.whatsapp.net',
+    fromMe: false,
+    id: '3BA13E61EE2DEA063AF78C09E7DED944',
+    participant: undefined
+  },
+  messageTimestamp: 1726596592,
+  pushName: 'Elver Tique',
+  broadcast: false,
+  message: Message {
+    conversation: '7',
+    messageContextInfo: MessageContextInfo {
+      deviceListMetadata: [DeviceListMetadata],
+      deviceListMetadataVersion: 2,
+      messageSecret: [Uint8Array]
+    }
+  },
+  body: '7',
+  from: '573026676033'
+}
