@@ -47,7 +47,7 @@ const FlowGestionAmbiental = addKeyword(EVENTS.ACTION)
 const flowCatalogo = addKeyword(EVENTS.ACTION)
     .addAnswer("Aquí puedes ver nuestro catálogo:")
     .addAnswer("[📘 *Ver Catálogo*]",{
-        media: "https://66e4937fb3a8646e4e519a29--harmonious-chimera-7080df.netlify.app/assets/Catalogo-Cv4DpgvU.pdf"
+        media: "https://66eadd7413983623663756c3--stunning-biscotti-b07bd7.netlify.app/assets/Catalogo-Cv4DpgvU.pdf"
     }) // Acceso al archivo de catálogo desde el proyecto
     .addAnswer("Gracias por revisar nuestro catálogo. ¿Puedo ayudarte con algo más?")
     .addAnswer("[💼 *Si estas interasado en uno de nuestros productos sigue el siguiente enlace y contacte con nuestra linea comercial*](https://api.whatsapp.com/send?phone=573145719136&text=Hola)")
@@ -73,7 +73,7 @@ const flowPrincipal = addKeyword(EVENTS.WELCOME)
 
 const welcomFlow= addKeyword("")
 .addAnswer("👋 ¡Hola!  Bienvenido a nuestro *Chatbot*  soy *Gaia* tu asesora vitual",{
-    media:"https://66e4937fb3a8646e4e519a29--harmonious-chimera-7080df.netlify.app/assets/chatbot-CeoPh30W.jpg"
+    media:"https://66eadd7413983623663756c3--stunning-biscotti-b07bd7.netlify.app/assets/chatboot-Cuby35Lh.jpg"
 })
 .addAnswer(
     [
