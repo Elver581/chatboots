@@ -7,13 +7,14 @@ const { delay } = require('@whiskeysockets/baileys');
 
 
 // Ruta del catálogo en tu proyecto
-const catalogoURL = 'https://setasplast.com.co/assets/SetasPlastBrochureEmpresarial-eawpt2g4.pdf';
+
 
 // Función para enviar un mensaje después de 10 minutos (600000 ms)
 
 
 // Funciones para cada flujo
-const flowAtencionCliente = addKeyword(EVENTS.ACTION)
+
+const flowAtencionCliente = addKeyword(EVENTS.ACTION) 
     .addAnswer("Hola, sigue el enlace haciendo clic en el siguiente botón:")
     .addAnswer("[📲 *Atención al Cliente*](https://api.whatsapp.com/send?phone=573105083525&text=Hola)")
     .addAnswer("Gracias por comunicarte con Servicio al Cliente. ¿Puedo ayudarte con algo más?")
@@ -47,7 +48,7 @@ const FlowGestionAmbiental = addKeyword(EVENTS.ACTION)
 const flowCatalogo = addKeyword(EVENTS.ACTION)
     .addAnswer("Aquí puedes ver nuestro catálogo:")
     .addAnswer("[📘 *Ver Catálogo*]",{
-        media: "https://66eadd7413983623663756c3--stunning-biscotti-b07bd7.netlify.app/assets/Catalogo-Cv4DpgvU.pdf"
+        media: "https://setasplast.com.co/assets/Catalogo-Cv4DpgvU.pdf"
     }) // Acceso al archivo de catálogo desde el proyecto
     .addAnswer("Gracias por revisar nuestro catálogo. ¿Puedo ayudarte con algo más?")
     .addAnswer("[💼 *Si estas interasado en uno de nuestros productos sigue el siguiente enlace y contacte con nuestra linea comercial*](https://api.whatsapp.com/send?phone=573145719136&text=Hola)")
@@ -60,21 +61,84 @@ const flowPqr = addKeyword(EVENTS.ACTION)
     .addAnswer("Gracias por dejarnos tu solicitud. ¿Puedo ayudarte con algo más?")
     .addAnswer("*Para regresar al Menu Principal Digita 9️⃣*");
 
+
+
+
+let timeout; // Variable global para el temporizador
+
+const resetTimeout = (ctx, { gotoFlow }) => {
+    if (timeout) clearTimeout(timeout); // Limpiar el temporizador previo
+    timeout = setTimeout(() => {
+        gotoFlow(flujoFinal); // Ir al flujo de cancelación por inactividad
+    },3500000); // 20 segundos de inactividad 7200000
+};
+// Flujo para manejar las opciones del menú
+const menuFlow = addKeyword(["9"])
+    .addAnswer(
+        [
+            '🌐 *Canales de Comunicación*',
+            '',
+            'Te comparto nuestros canales de comunicación para brindarte una mejor atención:',
+            '',
+            'Selecciona una *Opción*:',
+            '',
+            '1️⃣ *Área Comercial*',
+            '2️⃣ *Contabilidad*',
+            '3️⃣ *Área Administrativa*',
+            '4️⃣ *Gestión Ambiental*',
+            '5️⃣ *Atención al Cliente*',
+            '6️⃣ *PQR*',
+            '7️⃣ *Catálogo*',
+            '',
+            '✏️ Escribe el número correspondiente para continuar.'
+        ],
+        { capture: true }, // idle: 2000 = 2 segundos
+        async (ctx, { gotoFlow, inRef, flowDynamic, fallBack }) => {
+            resetTimeout(ctx, { gotoFlow });
+            const opcionesValidas = ["1", "2", "3", "4", "5", "6", "7", "9"];
+            const seleccion = ctx.body.trim(); // Asegúrate de que no haya espacios en blanco
+
+            if (!opcionesValidas.includes(seleccion)) {
+                return fallBack("❌ Respuesta no válida, por favor selecciona una opción válida.");
+            }
+
+            switch (seleccion) {
+                case "1":
+                    return gotoFlow(flowAreaComercial);
+                case "2":
+                    return gotoFlow(flowContabilidad);
+                case "3":
+                    return gotoFlow(FlowAdministrativa);
+                case "4":
+                    return gotoFlow(FlowGestionAmbiental);
+                case "5":
+                    return gotoFlow(flowAtencionCliente);
+                case "6":
+                    return gotoFlow(flowPqr);
+                case "7":
+                    return gotoFlow(flowCatalogo);
+                case "9":
+                    return; // Volver al menú principal
+            }
+        }
+    );
+
 // Flujo principal de bienvenida
-const flowPrincipal = addKeyword(EVENTS.WELCOME)
+const flowPrincipal = addKeyword("Hola")
+.addAnswer("👋 ¡Hola!  Bienvenido a nuestro *Chatbot*  soy *Gaia* tu asesora vitual",{
+    media:"./img/logo.png"
+})
 .addAnswer(
-  
+
     null,
     async (ctx, { gotoFlow, flowDynamic, }) => {
      // Activar recordatorio de 10 minutos
         return gotoFlow(welcomFlow); // Mostrar el menú directamente
     }
-).addAnswer("👋 ¡Hola! ${nombre} Bienvenido a nuestro *Chatbot*  soy *Gaia* tu asesora vitual")
+)
 
 const welcomFlow= addKeyword("")
-.addAnswer("👋 ¡Hola!  Bienvenido a nuestro *Chatbot*  soy *Gaia* tu asesora vitual",{
-    media:"https://66eadd7413983623663756c3--stunning-biscotti-b07bd7.netlify.app/assets/chatboot-Cuby35Lh.jpg"
-})
+
 .addAnswer(
     [
         'Somos *SETASPLAST SAS BIC*, especializados en fabricacion y comercialización de productos plásticos *biodegradables* y *100% reciclables* 🌱🌍✨.',
@@ -95,81 +159,6 @@ const welcomFlow= addKeyword("")
     }
     
 )
-
-
-let timeout; // Variable global para el temporizador
-
-const resetTimeout = (ctx, { gotoFlow }) => {
-    if (timeout) clearTimeout(timeout); // Limpiar el temporizador previo
-    timeout = setTimeout(() => {
-        gotoFlow(flujoFinal); // Ir al flujo de cancelación por inactividad
-    },3500000); // 20 segundos de inactividad 7200000
-};
-// Flujo para manejar las opciones del menú
-const menuFlow = addKeyword(["9"])
-
-.addAnswer(
-    [
-        '🌐 *Canales de Comunicación*',
-        '',
-        'Te comparto nuestros canales de comunicación para brindarte una mejor atención:',
-        '',
-        'Selecciona una *Opción*:',
-        '',
-        '1️⃣ *Área Comercial*',
-        '2️⃣ *Contabilidad*',
-        '3️⃣ *Área Administrativa*',
-        '4️⃣ *Gestión Ambiental*',
-        '5️⃣ *Atención al Cliente*',
-        '6️⃣ *PQR*',
-        '7️⃣ *Catálogo*',
-        '',
-        '✏️ Escribe el número correspondiente para continuar.'
-    ],
-  
-  
-        { capture: true}, // idle: 2000 = 2 segundos
-        async (ctx, { gotoFlow, inRef,flowDynamic, fallBack}) => {
-         resetTimeout(ctx, { gotoFlow });
-            const opcionesValidas = ["1", "2", "3", "4", "5", "6", "7", "9"];
-            if (!opcionesValidas.includes(ctx.body)) {
-                
-                return fallBack("❌ Respuesta no válida, por favor selecciona una opción válida.");
-            }
-
-             switch (ctx.body) {
-                case "1":
-                    return gotoFlow(flowAreaComercial);
-                case "2":
-                    return gotoFlow(flowContabilidad);
-                case "3":
-                    return gotoFlow(FlowAdministrativa);
-                case "4":
-                    return gotoFlow(FlowGestionAmbiental);
-                case "5":
-                    return gotoFlow(flowAtencionCliente);
-                case "6":
-                    return gotoFlow(flowPqr);
-                case "7":
-                    return gotoFlow(flowCatalogo);
-              
-                 
-            }
-        
-
-            }
-
-          
-            
-        
-            
-        
-    
-   
-)
-
-
-
     
 const flujoFinal = addKeyword("").addAnswer('Gracias por haber interactuado con nosotros. Si necesitas más información, no dudes en volver a contactarnos. ¡Que tengas un excelente día!');
 
@@ -188,7 +177,7 @@ const main = async () => {
     });
 
     const adapterFlow = createFlow([menuFlow, flowAtencionCliente, 
-        flowAreaComercial, flowContabilidad, flowCatalogo, flowPqr, flowPrincipal,FlowAdministrativa,FlowGestionAmbiental,welcomFlow,flujoFinal]);
+        flowAreaComercial, flowContabilidad, flowCatalogo, flowPqr,FlowAdministrativa,FlowGestionAmbiental,welcomFlow,flujoFinal]);
     const adapterProvider = createProvider(BaileysProvider);
 
     createBot({
